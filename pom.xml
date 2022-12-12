@@ -101,10 +101,16 @@
                   <phase>install</phase>
                   <configuration>
                     <target>
-                      <move file="${project.build.directory}/${project.artifactId}-${project.version}.jar" todir="${project.basedir}/dist" />
+                        
+                      <!-- Move Jar file and libs to the "dist" folder -->
+                      <move file="${project.build.directory}/${project.artifactId}-${project.version}.jar" tofile="${project.basedir}/dist/${project.artifactId}.jar" />
                       <move todir="${project.basedir}/dist/lib" >
                           <fileset dir="${project.build.directory}/lib" />
                       </move>
+                      
+                      <!-- Delete Rhino jar file -->
+                      <delete file="${project.basedir}/dist/lib/js-1.7R2.jar"/>
+                      
                     </target>
                   </configuration>
                   <goals>
