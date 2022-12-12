@@ -78,7 +78,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions
         with:
-          tag_name: ${{ env.releaseLabel }}
+          tag_name: v${{ env.releaseLabel }}
           release_name: Release ${{ env.releaseLabel }}
           body: |
             JSCompressor Release ${{ env.releaseLabel }}
@@ -94,6 +94,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: JSCompressor-${{ env.releaseLabel }}.zip
-          asset_name: JSCompressor-${{ env.releaseLabel }}.zip
+          asset_path: JSCompressor_v${{ env.releaseLabel }}.zip
+          asset_name: JSCompressor_v${{ env.releaseLabel }}.zip
           asset_content_type: application/zip
