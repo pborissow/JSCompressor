@@ -1,0 +1,99 @@
+on:
+  push:
+    tags:
+    - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+
+name: Create Release
+
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get tag reference id
+            # parse the github reference tag from the direct input (github.ref)
+        run: |
+             githubRef=${{ github.ref }}
+             githubRef="${githubRef/'refs/tags'/''}"
+             githubRef="${githubRef/'/'/''}"
+             githubRef="${githubRef/'v'/''}"
+             echo "releaseLabel=$githubRef" >> $GITHUB_ENV
+
+      - name: Read exported variable - (test to verify the dynamic releaseLabel Variable is global)
+        run: |
+          echo $releaseLabel
+
+
+     # create project directory
+      - name: Create compiled project directory
+        run: mkdir compiledProjectDirectory
+
+
+
+    ### Prepare machine to generate jar file
+
+     # add/instantiate JDK 11 on runner
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+     # install maven 3.6.3 (current default latest version Ubuntu)
+      - name: Install Maven
+        run: sudo apt install maven
+
+     # show current maven version in Github Actions output (should be 3.6.3)
+     # Note: errors may occur when using other versions
+      - name: Check Maven Version
+        run: mvn -version
+
+
+    ### build jar file
+
+     # build jar file
+      - name: Build jar using Maven
+        run: mvn --batch-mode install verify -U -X
+
+     # copy jar file to main directory
+      - name: Copy jar file to main directory
+        run: |
+          cp dist/JSCompressor-dev.jar dist/JSCompressor-${{ env.releaseLabel }}.jar
+
+
+
+      # Zip project
+      - name: Zip configured project directory into downloadable release.zip file
+        run: cd dist; zip -r ../JSCompressor-${{ env.releaseLabel }}.zip *
+
+
+     # Create the release to serve as a place to export to
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions
+        with:
+          tag_name: ${{ env.releaseLabel }}
+          release_name: Release ${{ env.releaseLabel }}
+          body: |
+            JSCompressor Release ${{ env.releaseLabel }}
+          draft: false
+          prerelease: false
+
+
+     # add packaged project to Github Release page
+      - name: Upload packaged project to Github Release page
+        id: upload-release-asset-minified
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: JSCompressor-${{ env.releaseLabel }}.zip
+          asset_name: JSCompressor-${{ env.releaseLabel }}.zip
+          asset_content_type: application/zip
