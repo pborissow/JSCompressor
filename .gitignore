@@ -1,0 +1,7 @@
+build/
+target/
+nbproject/
+
+build.xml
+
+**/!README.TXT
