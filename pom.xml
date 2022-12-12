@@ -16,7 +16,7 @@
   <!-- =========================================================== -->
     <groupId>javaxt</groupId>
     <artifactId>JSCompressor</artifactId>
-    <version>1.0.0</version>
+    <version>dev</version>
     <packaging>jar</packaging>
 
   <!-- =========================================================== -->
@@ -34,7 +34,7 @@
         <dependency>
           <groupId>javaxt</groupId>
           <artifactId>javaxt-core</artifactId>
-          <version>1.10.6</version>
+          <version>1.12.1</version>
         </dependency>
 
 
