@@ -59,16 +59,10 @@ jobs:
       - name: Build jar using Maven
         run: mvn --batch-mode install verify -U -X
 
-     # copy jar file to main directory
-      - name: Copy jar file to main directory
-        run: |
-          cp dist/JSCompressor-dev.jar dist/JSCompressor-${{ env.releaseLabel }}.jar
-
-
 
       # Zip project
       - name: Zip configured project directory into downloadable release.zip file
-        run: cd dist; zip -r ../JSCompressor-${{ env.releaseLabel }}.zip *
+        run: cd dist; zip -r ../JSCompressor_v${{ env.releaseLabel }}.zip *
 
 
      # Create the release to serve as a place to export to
